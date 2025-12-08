@@ -32,7 +32,9 @@ const normalized = computed(() => {
   }
 })
 
-function onChildAnswer() {}
+function onChildAnswer(id, answer) {
+  emit('answer', { id, answer })
+}
 </script>
 
 <template>
@@ -41,5 +43,11 @@ function onChildAnswer() {}
     <p v-if="question.description" class="text-gray-500 mb-3">
       {{ question.description }}
     </p>
+    <component
+      :is="componentMap[question.type]"
+      :options="normalized.options"
+      :placeholder="normalized.placeholder"
+      @update:modelValue="(v) => onChildAnswer(question.id, v)"
+    />
   </div>
 </template>

@@ -2,12 +2,22 @@
 import { ref } from 'vue'
 import SurveyForm from './components/SurveyForm.vue'
 import SummaryPanel from './components/SummaryPanel.vue'
+import QuestionCreator from './components/QuestionCreator.vue'
 import { surveyQuestions } from './data/questions.js'
 
 const answers = ref({})
 
-function onAnswer() {}
-function resetSurvey() {}
+function onAnswer({ id, answer }) {
+  answers.value[id] = answer
+}
+
+function resetSurvey() {
+  answers.value = {}
+}
+
+function addQuestion(data) {
+  surveyQuestions.push(data)
+}
 </script>
 
 <template>
@@ -17,10 +27,15 @@ function resetSurvey() {}
 
       <div class="grid gap-6 md:grid-cols-2">
         <div class="bg-white rounded-2xl shadow p-6">
-          <SurveyForm  />
+          <SurveyForm :questions="surveyQuestions" :answers="answers" @answer="onAnswer" />
         </div>
 
-        <SummaryPanel :answers="answers" :survey-questions="surveyQuestions" />
+        <SummaryPanel
+          :answers="answers"
+          :survey-questions="surveyQuestions"
+          @reset-survey="resetSurvey"
+        />
+        <QuestionCreator @add-question="addQuestion" />
       </div>
     </div>
   </div>
