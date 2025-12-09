@@ -1,10 +1,10 @@
 <script setup>
-import { ref, computed, watch } from 'vue'
+import { computed } from 'vue'
 import ProgressBar from './card/ProgressBar.vue'
 import QuestionCard from './card/QuestionCard.vue'
 import NavigationButtons from './card/NavigationButtons.vue'
 
-const props = defineProps({
+const { questions, answers, currentStep } = defineProps({
   questions: {
     type: Array,
     default: () => [],
@@ -13,32 +13,23 @@ const props = defineProps({
     type: Object,
     default: () => ({}),
   },
+  currentStep: {
+    type: Number,
+  },
 })
 
-const emit = defineEmits({ answer: null })
+const emit = defineEmits(['answer', 'go-next', 'go-back'])
 
-const currentStep = ref(0)
-const currentQuestion = computed(() => props.questions[currentStep.value])
-const currentAnswerQuestion = computed(() => props.answers[currentQuestion.value.id])
-const isLastStep = computed(() => currentStep.value === props.questions.length - 1)
-
-watch(
-  props.answers,
-  (newAnswers) => {
-    if (JSON.stringify(newAnswers) === '{}') {
-      alert('answers resetted!')
-      currentStep.value = 0
-    }
-  },
-  { deep: true },
-)
+const currentQuestion = computed(() => questions[currentStep])
+const currentAnswerQuestion = computed(() => answers[currentQuestion.value.id])
+const isLastStep = computed(() => currentStep === questions.length - 1)
 
 const canGoNext = computed(() => {
   const question = currentQuestion.value
   if (!question) {
     return false
   }
-  const answer = props.answers[question.id]
+  const answer = answers[question.id]
   if (question.type === 'checkbox') {
     return Array.isArray(answer) && answer.length > 0
   }
@@ -52,11 +43,11 @@ function onAnswer({ id, answer }) {
 
 function onGoNext() {
   if (!canGoNext.value) return
-  if (!isLastStep.value) currentStep.value++
+  if (!isLastStep.value) emit('go-next')
 }
 
 function onGoBack() {
-  if (currentStep.value > 0) currentStep.value--
+  if (currentStep > 0) emit('go-back')
 }
 </script>
 

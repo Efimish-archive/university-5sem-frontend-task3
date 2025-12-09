@@ -3,9 +3,11 @@ import { ref } from 'vue'
 import SurveyForm from './components/SurveyForm.vue'
 import SummaryPanel from './components/SummaryPanel.vue'
 import QuestionCreator from './components/QuestionCreator.vue'
-import { surveyQuestions } from './data/questions.js'
+import { surveyQuestions as initialSurveyQuestions } from './data/questions.js'
 
+const surveyQuestions = ref([...initialSurveyQuestions])
 const answers = ref({})
+const currentStep = ref(0)
 
 function onAnswer({ id, answer }) {
   answers.value[id] = answer
@@ -13,10 +15,11 @@ function onAnswer({ id, answer }) {
 
 function resetSurvey() {
   answers.value = {}
+  currentStep.value = 0
 }
 
-function addQuestion(data) {
-  surveyQuestions.push(data)
+function addQuestion(newQuestion) {
+  surveyQuestions.value.push(newQuestion)
 }
 </script>
 
@@ -27,7 +30,14 @@ function addQuestion(data) {
 
       <div class="grid gap-6 md:grid-cols-2">
         <div class="bg-white rounded-2xl shadow p-6">
-          <SurveyForm :questions="surveyQuestions" :answers="answers" @answer="onAnswer" />
+          <SurveyForm
+            :questions="surveyQuestions"
+            :answers="answers"
+            :currentStep="currentStep"
+            @answer="onAnswer"
+            @go-next="currentStep++"
+            @go-back="currentStep--"
+          />
         </div>
 
         <SummaryPanel
