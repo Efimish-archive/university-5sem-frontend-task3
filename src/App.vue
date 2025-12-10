@@ -18,6 +18,11 @@ function resetSurvey() {
   currentStep.value = 0
 }
 
+function finishSurvey() {
+  alert(['Вы закончили опрос!', 'Мы украдем все ваши данные и продадим их!'].join('\n'))
+  resetSurvey();
+}
+
 function addQuestion(newQuestion) {
   surveyQuestions.value.push(newQuestion)
 }
@@ -37,6 +42,7 @@ function addQuestion(newQuestion) {
             @answer="onAnswer"
             @go-next="currentStep++"
             @go-back="currentStep--"
+            @finish="finishSurvey"
           />
         </div>
 
@@ -45,7 +51,7 @@ function addQuestion(newQuestion) {
           :survey-questions="surveyQuestions"
           @reset-survey="resetSurvey"
         />
-        <QuestionCreator @add-question="addQuestion" />
+        <QuestionCreator @create="addQuestion" />
       </div>
     </div>
   </div>

@@ -18,7 +18,7 @@ const { questions, answers, currentStep } = defineProps({
   },
 })
 
-const emit = defineEmits(['answer', 'go-next', 'go-back'])
+const emit = defineEmits(['answer', 'go-next', 'go-back', 'finish'])
 
 const currentQuestion = computed(() => questions[currentStep])
 const currentAnswerQuestion = computed(() => answers[currentQuestion.value.id])
@@ -42,8 +42,9 @@ function onAnswer({ id, answer }) {
 }
 
 function onGoNext() {
-  if (!canGoNext.value) return
-  if (!isLastStep.value) emit('go-next')
+  if (!canGoNext.value) return;
+  if (!isLastStep.value) emit('go-next');
+  else emit('finish');
 }
 
 function onGoBack() {
@@ -54,18 +55,9 @@ function onGoBack() {
 <template>
   <ProgressBar :current-step="currentStep" :total-steps="questions.length" />
 
-  <QuestionCard
-    v-if="currentQuestion"
-    :question="currentQuestion"
-    :answer-question="currentAnswerQuestion"
-    @answer="onAnswer"
-  />
+  <QuestionCard v-if="currentQuestion" :question="currentQuestion" :answer-question="currentAnswerQuestion"
+    @answer="onAnswer" />
 
-  <NavigationButtons
-    :can-go-back="currentStep > 0"
-    :can-go-next="canGoNext"
-    :is-last-step="isLastStep"
-    @go-next="onGoNext"
-    @go-back="onGoBack"
-  />
+  <NavigationButtons :can-go-back="currentStep > 0" :can-go-next="canGoNext" :is-last-step="isLastStep"
+    @go-next="onGoNext" @go-back="onGoBack" />
 </template>
